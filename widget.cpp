@@ -14,7 +14,16 @@ Widget::Widget(QWidget *parent)
 
     QListWidgetItem *item = new QListWidgetItem(mpListWidget);
     mpListWidget->addItem(item);
-}
+
+    /*
+    connect(mpListWidget,&QListWidget::itemClicked,[](QListWidgetItem *item){
+        if(item->checkState() == Qt::Checked)
+            item->setCheckState(Qt::Unchecked);
+        else
+            item->setCheckState(Qt::Checked);
+    });
+    */
+ }
 
 Widget::~Widget()
 {
@@ -26,16 +35,18 @@ void Widget::on_pushButton_clicked()
 {
     QString text = ui->lineEdit->text();
 
-    QListWidgetItem *item = new QListWidgetItem(text,mpListWidget);
+    QListWidgetItem *item = new QListWidgetItem("",mpListWidget);
     Qt::ItemFlags flags = item->flags();
-    item->setFlags(flags | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-    item->setData(Qt::CheckStateRole,Qt::Unchecked);
-    //QCheckBox *chkBox = new QCheckBox(mpListWidget);
+    //item->setFlags(flags | Qt::ItemIsUserCheckable);
+    //item->setData(Qt::CheckStateRole,Qt::Checked);
+    QCheckBox *chkBox = new QCheckBox(mpListWidget);
     item->setTextAlignment(Qt::AlignCenter);
+    chkBox->setText(text);
+
+    qDebug()<<chkBox->size();
 
     mpListWidget->addItem(item);
-    //mpListWidget->setItemWidget(item,chkBox);
-    //mpListWidget->addItem(text);
+    mpListWidget->setItemWidget(item,chkBox);
 }
 
 
@@ -45,20 +56,20 @@ void Widget::on_comboBox_currentIndexChanged(int index)
     if(!item)
         return;
 
-    QString text = item->text();
 
     QWidget *widget = mpListWidget->itemWidget(item);
-    //QCheckBox *chkBox = dynamic_cast<QCheckBox *>(widget);
-    Qt::CheckState chkStat = item->checkState();
+    QCheckBox *chkBox = dynamic_cast<QCheckBox *>(widget);
 
-    /*
+
     if(!chkBox)
     {
         ui->textEdit->append("null");
         return;
     }
-        */
+
+    Qt::CheckState chkStat = chkBox->checkState();
     QString chkStr = (chkStat==Qt::Checked)?"Checked":"UnChecked";
+    QString text = chkBox->text();
 
     QString sumText = QString("index: %1  text: %2  checkstate: %3")\
                           .arg(index).arg(text).arg(chkStr);
